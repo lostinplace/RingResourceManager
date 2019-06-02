@@ -1,4 +1,4 @@
-#Introduction
+# Introduction
 
 This is a library I built to manage expirable resources for a mod API that is being deprecated.
 
@@ -10,7 +10,7 @@ It allows you to manage a bunch of resources in a ring-like structure, meaning t
 
 As part of the checkout call, yo may specify a maximum search depth, if that depth is exceeded while looking for an available resource then an `InvalidOperationException` will be thrown
 
-#Example
+# Example
 ```csharp
 var t = RingResourceManager.FromShortBoundaries(10, 250);
 var actuals = Enumerable.Repeat(0, 200).Select(_ => t.CheckOutResource());
