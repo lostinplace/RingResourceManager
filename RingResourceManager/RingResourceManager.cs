@@ -50,7 +50,7 @@ namespace RingResources
     {
       if (allowedDepth == 0) throw new InvalidOperationException("Max search depth reached"){};
 
-      if(this.isCheckedOut) return next.checkout(ttl, allowedDepth-1);
+      if (this.isCheckedOut) return next.checkout(ttl, allowedDepth - 1);
       
       this.isCheckedOut = true;
       this.expirationTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ttl;
@@ -60,8 +60,9 @@ namespace RingResources
     public RingResourceNode(T value){
       this.value = value;
       this.expirationTime = 0;
-    }
+    }    
   }
+
 
   public static class RingResourceManager
   {
@@ -98,6 +99,38 @@ namespace RingResources
       tmp.next = this.resourceNodes[0];
       latest = this.resourceNodes[0];
     }
+
+    public void Add(T resource)
+    {
+      RingResourceNode<T> testKey;
+      if(resourceLocations.TryGetValue(resource, out testKey))
+      {
+        throw new ArgumentException("specified resource is already being managed");
+      }
+      
+      var newNode = new RingResourceNode<T>(resource);
+      var lastNode = resourceNodes.Last();
+      lastNode.next = newNode;
+      newNode.next = resourceNodes.First();
+      resourceNodes.Add(newNode);
+      resourceLocations[resource] = newNode;
+    }
+
+    public void Remove(T resource)
+    {
+      RingResourceNode<T> node;
+      if (!resourceLocations.TryGetValue(resource, out node))
+      {
+        throw new ArgumentException("specified resource is not being managed");
+      }
+      
+      var previousNode = resourceNodes.Find(x => x.next == node);
+      var nextNode = node.next;
+      previousNode.next = nextNode;
+      resourceLocations.Remove(resource);
+      resourceNodes.Remove(node);
+    }
+
 
     /// <summary>
     /// Checks out a resource that is managed by the manager
