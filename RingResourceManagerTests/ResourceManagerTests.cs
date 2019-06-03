@@ -50,6 +50,34 @@ namespace RingResourceManagerTests
     }
 
     [TestMethod]
+    public void TestCheckoutsAfterCheckin()
+    {
+      var t = RingResourceManager.FromShortBoundaries(10, 13);
+      var expecteds = new List<short>()
+      {
+        10,11,12,13,10,11
+      };
+      var actuals = new List<short>()
+      {
+        t.CheckOutResource(),
+        t.CheckOutResource(),
+        t.CheckOutResource(),
+        t.CheckOutResource(),
+      };
+      t.CheckInResource(10);
+      t.CheckInResource(11);
+      actuals.Add(t.CheckOutResource());
+      actuals.Add(t.CheckOutResource());
+
+      var tests = expecteds.Zip(actuals, (x, y) => (x, y));
+      foreach (var item in tests)
+      {
+        var (expected, actual) = item;
+        Assert.AreEqual(expected, actual);
+      }
+    }
+
+    [TestMethod]
     public void TestCheckoutsAfterExpiration()
     {
       var t = RingResourceManager.FromShortBoundaries(10, 13);
